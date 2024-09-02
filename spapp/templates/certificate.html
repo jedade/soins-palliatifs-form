@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Téléchargement</title>
+</head>
+<body>
+    
+    <a id="download-link" href="{{ url_for('send_certificate', filename=filename) }}"></a>
+    <script>
+        // Fonction pour télécharger le fichier et rediriger
+        document.getElementById('download-link').click();
+        setTimeout(function() {
+            window.location.href = "{{ url_for('thank_you') }}";
+        }, 1000); // Attendre 1 seconde avant la redirection
+    </script>
+</body>
+</html>
