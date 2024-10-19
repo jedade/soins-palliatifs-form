@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file,
 import fitz  # PyMuPDF
 import tempfile
 import os
-from personnes import  users
+from personnes import  users_communication, users_participation, users_service
 from spapp.utils import *
 from config import secret
 app = Flask(__name__)
@@ -75,17 +75,27 @@ def form():
 def verify():
     first_name = request.form['first_name'].strip()
     last_name = request.form['last_name'].strip()
+    cert_type = request.form['type'].strip()
     name = None
-    for user in users:
-        
-        if are_anagrams(user, f"{first_name.lower()} {last_name.lower()}"):
-            name = user
+    if cert_type == 'service':
+        for user in users_service:
+            
+            if are_anagrams(user, f"{first_name.lower()} {last_name.lower()}"):
+                name = user
+    elif cert_type == 'participation':
+        for user in users_participation:
+            
+            if are_anagrams(user, f"{first_name.lower()} {last_name.lower()}"):
+                name = user
+    elif cert_type == 'communication':
+        for user in users_communication:
+            
+            if are_anagrams(user, f"{first_name.lower()} {last_name.lower()}"):
+                name = user
     # Vérifier dans le fichier texte
     
-
-
     if name is not None:
-        return redirect(url_for('generate_certificate', last_name=last_name, name=name))
+        return redirect(url_for('generate_certificate', last_name=last_name, name=name, cert_type=cert_type))
     else:
         flash(f"Le nom {first_name} {last_name} n'est pas dans la liste des personnes ayant droit au certificat.", 'danger')
         return redirect(url_for('form'))
@@ -101,20 +111,29 @@ def send_certificate(filename):
 def generate_certificate():
     last_name = request.args.get('last_name')
     name = request.args.get('name')
+    cert_type = request.args.get('cert_type')
     # Obtenir le répertoire courant du script
     
 
     # Construire le chemin pour stocker le fichier PDF dans le répertoire static/tmp
     filename = os.path.join(base_dir, 'static', 'tmp', f'{last_name}_certificat.pdf')
 
+    model_pdf_path = None
+    print(cert_type)
 
-    model_pdf_path = os.path.join(base_dir, 'templates', 'model.pdf')  # Modifier pour correspondre à votre chemin
-    if not os.path.isfile(model_pdf_path):
-        return f"Erreur : Le modèle PDF n'existe pas à l'emplacement {model_pdf_path}."
+    # Vérifier le type d'attestation et définir le chemin du modèle PDF
+    if cert_type == 'communication':
+        model_pdf_path = os.path.join(base_dir, 'templates', 'communication.pdf')
+    elif cert_type == 'service':
+        model_pdf_path = os.path.join(base_dir, 'templates', 'service.pdf')
+    elif cert_type == 'participation':
+        model_pdf_path = os.path.join(base_dir, 'templates', 'participation.pdf')
+    else:
+        return "Erreur : Type d'attestation non valide."
 
     
     # Modifier le PDF pour ajuster le nom
-    replace_text_in_pdf(model_pdf_path, filename, 'Nom du participant',  name, f'{last_name}_certificat.pdf')
+    replace_text_in_pdf(model_pdf_path, filename, 'NOM_DU_PARTICIPANT',  name, f'{last_name}_certificat.pdf')
 
     # Vérifier si le PDF modifié a été créé
     if not os.path.isfile(filename):

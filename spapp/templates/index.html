@@ -54,17 +54,24 @@
         
         <form action="/verify" method="post">
           <div class="row">
-            <div class="col">
+            <div class="col-12">
+              <select class="form-select" id="type" name="type" required>
+                <option selected disabled value="">Type d'attestation</option>
+                <option value="communication">Attestation de communication</option>
+                <option value="participation">Attestation de participation</option>
+                <option value="service">Attestation de service rendu à la communauté</option>
+              </select>
+              <br>
+            </div>
+            <div class="col-6">
               <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Entrez votre Prénom" required>
             </div>
-            <div class="col">
+            <div class="col-6">
               <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Entrez votre Nom" required>
             </div>
           </div>
          
           <!-- 2 column grid layout for inline styling -->
-          
-        
           <!-- Submit button -->
           <button data-mdb-ripple-init type="submit" class="btn btn-primary btn-block mt-5">Vérifier</button>
         </form>
